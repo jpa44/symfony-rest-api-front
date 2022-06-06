@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const Register = async ({dispatch}, form) => {
+export const register = async ({ dispatch }, form) => {
     await axios.post('register', form)
     let UserForm = new FormData()
     UserForm.append('username', form.username)
@@ -8,12 +8,42 @@ export const Register = async ({dispatch}, form) => {
     await dispatch('LogIn', UserForm)
 }
 
-export const LogIn = async ({commit}, User) => {
-    await axios.post('login', User)
-    await commit('setUser', User)
+export const logIn = ({ commit }, user) => {
+    return new Promise((resolve, reject) => {
+        axios.post('login',
+            JSON.stringify({
+                "email": user.email,
+                "password": user.password
+            }),
+            {
+                headers: { "Content-Type": "application/json" }
+            }).then((response) => {
+                commit('setUserToken',response.data.token)
+                resolve();
+            }).catch((error) => {
+                reject(error);
+            });
+    })
 }
 
-export const LogOut = async ({commit}) => {
-    let user = null
-    commit('logout', user)
+
+export const getAuthUser = ({ commit, state }) => {
+    return new Promise((resolve, reject) => {
+        axios.get('user',
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${state.userToken}`
+                }
+            }).then((response) => {
+                commit('setAuthUser', JSON.parse(response.data))
+                resolve();
+            }).catch((error) => {
+                reject(error);
+            });
+    })
+}
+
+export const logOut = async ({ commit }) => {
+    commit('logOut')
 }

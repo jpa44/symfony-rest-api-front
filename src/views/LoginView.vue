@@ -1,50 +1,27 @@
 <template>
-  <v-app>
+  <v-app class="login">
     <v-main>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
+          <v-flex xs12 sm8 md3>
             <v-card class="elevation-12">
-              <v-toolbar dark color="primary">
-                <v-toolbar-title>{{ isRegister ? stateObj.register.name : stateObj.login.name }} form</v-toolbar-title>
-              </v-toolbar>
+              <v-card-text>
+                <img src="@/assets/logo.png" width="80" />
+                <h2>{{ isRegister ? stateObj.register.name : stateObj.login.name }} to use our service</h2>
+              </v-card-text>
               <v-card-text>
                 <form ref="form" @submit.prevent="isRegister ? register() : login()">
-                  <v-text-field v-if="isRegister"
-                                v-model="username"
-                                name="username"
-                                label="Username"
-                                type="username"
-                                placeholder="username"
-                                required
-                  ></v-text-field>
+                  <v-text-field v-if="isRegister" v-model="username" name="username" label="Username" type="username"
+                    placeholder="username" required></v-text-field>
 
-                  <v-text-field
-                      v-model="email"
-                      name="email"
-                      label="Email"
-                      type="text"
-                      placeholder="email"
-                      required
-                  ></v-text-field>
+                  <v-text-field v-model="email" name="email" label="Email" type="text" placeholder="email" required>
+                  </v-text-field>
 
-                  <v-text-field
-                      v-model="password"
-                      name="password"
-                      label="Password"
-                      type="password"
-                      placeholder="password"
-                      required
-                  ></v-text-field>
+                  <v-text-field v-model="password" name="password" label="Password" type="password"
+                    placeholder="password" required></v-text-field>
 
-                  <v-text-field v-if="isRegister"
-                                v-model="confirmPassword"
-                                name="confirmPassword"
-                                label="Confirm Password"
-                                type="password"
-                                placeholder="confirm password"
-                                required
-                  ></v-text-field>
+                  <v-text-field v-if="isRegister" v-model="confirmPassword" name="confirmPassword"
+                    label="Confirm Password" type="password" placeholder="confirm password" required></v-text-field>
 
                   <div class="red--text"> {{ errorMessage }}</div>
                   <v-btn type="submit" class="mt-4" color="primary" value="log in">
@@ -64,7 +41,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   name: "LoginView",
@@ -78,38 +55,42 @@ export default {
       errorMessage: "",
       stateObj: {
         register: {
-          name: 'Register',
-          message: 'Aleady have an Account? login.'
+          name: 'Sign up',
+          message: 'Sign in to existing account'
         },
         login: {
-          name: 'Login',
+          name: 'Sign in',
           message: 'Register'
         }
       }
     };
   },
   methods: {
-    ...mapActions(["LogIn"]),
-    ...mapActions(["Register"]),
-    async login() {
+    ...mapActions(["logIn", "register", "getAuthUser"]),
+    login() {
       this.errorMessage = "";
-      try {
-        await this.LogIn({
-          email: this.email,
-          password: this.password
+
+      this.logIn({
+        email: this.email,
+        password: this.password
+      }).then(() => {
+        this.errorMessage = "";
+
+        this.getAuthUser().then(() => {
+          this.$router.push({ name: "Dashboard" })
         });
 
-        await this.$router.push({name: "dashboard"});
-      } catch (error) {
+      }).catch((error) => {
+        console.error(error)
         this.errorMessage = "Invalid username or password";
-      }
+      });
     },
     async register() {
       if (this.password == this.confirmPassword) {
         this.errorMessage = "";
 
         try {
-          await this.Register({
+          await this.register({
             firstName: this.username,
             email: this.email,
             password: this.password
@@ -133,3 +114,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.login{
+  background-color: #242939!important;
+}
+</style>

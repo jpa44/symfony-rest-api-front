@@ -28,8 +28,6 @@ export function route (name, component, path = '') {
             )
     }
 
-    console.log(path)
-
     return {
         name,
         components,

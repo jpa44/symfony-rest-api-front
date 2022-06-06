@@ -1,8 +1,12 @@
 export default {
-    setUser(state, username) {
-        state.user = username
+    setAuthUser(state, user) {
+        state.authUser = user
     },
-    LogOut(state) {
+    setUserToken(state, token) {
+        state.userToken = token
+    },
+    logOut(state) {
         state.user = null
+        state.userToken = null
     },
 }
