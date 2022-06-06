@@ -2,7 +2,7 @@
 
 ### Netlify 
 
-- Project url : https://628b8408f4e87b52bb75f3f3--silly-cajeta-231ca3.netlify.app/
+- Project url : [https://silly-cajeta-231ca3.netlify.app](https://silly-cajeta-231ca3.netlify.app)
 
 ### Stack 
 
