@@ -16,6 +16,29 @@
                         <v-textarea color="purple" label="Description" v-model="description" />
                     </v-col>
 
+                    <v-col cols="12">
+                        <v-file-input small-chips truncate-length="15" @change="selectFile"></v-file-input>
+                    </v-col>
+
+                    <v-col cols="12" v-if="medias">
+                        <v-list dense nav>
+                            <v-list-item v-for="media in medias" :key="media.id" link>
+
+                                <v-list-item-icon>
+                                    <v-icon>mdi-file-document-outline</v-icon>
+                                </v-list-item-icon>
+
+                                <v-list-item-content>
+                                
+                                    <v-list-item-title><a :href="media.filePath">{{ sliceString(media.filePath) }}</a></v-list-item-title>
+
+                                </v-list-item-content>
+
+                            </v-list-item>
+
+                        </v-list>
+                    </v-col>
+
                     <v-col cols="12" class="text-right">
                         <v-btn color="primary" min-width="150" @click="submit">
                             {{ documentId ? 'Edit' : 'Add' }} document
@@ -37,7 +60,10 @@ export default {
             errorMessage: "",
             title: "",
             description: "",
-            documentType: ""
+            documentType: "",
+            progress: 0,
+            currentFile: null,
+            medias: []
         }
     },
     props: {
@@ -60,18 +86,28 @@ export default {
                 this.title = response.data.title
                 this.description = response.data.description
                 this.documentType = response.data.type.id
+                this.medias = response.data.medias
             });
         } else {
             this.title = "",
                 this.description = "",
                 this.documentType = ""
+            this.media = [];
         }
     },
     methods: {
         ...mapActions(["newDocument", "getDocument", "updateDocument"]),
+        selectFile(file) {
+            this.progress = 0;
+            this.currentFile = file;
+        },
+        sliceString(value) {
+            return value.substring(value.lastIndexOf("/") + 1)
+        },
         submit() {
             if (!this.documentId) {
                 this.newDocument({
+                    file: this.currentFile,
                     title: this.title,
                     description: this.description,
                     documentType: this.documentType,

@@ -28,7 +28,7 @@ export const getAuthUser = ({ commit, state }) => {
                     Authorization: `Bearer ${state.userToken}`
                 }
             }).then((response) => {
-                commit('setAuthUser', JSON.parse(response.data))
+                commit('setAuthUser', response.data)
                 resolve();
             }).catch((error) => {
                 reject(error);

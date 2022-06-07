@@ -70,17 +70,30 @@ export const getDocumentType = ({ commit }, userToken) => {
 
 export const newDocument = ({ commit }, value) => {
     return new Promise((resolve, reject) => {
-        axios.post('document',
-            JSON.stringify({
+
+        let formData;
+
+        if (!value.file) {
+            formData = JSON.stringify({
                 "title": value.title,
                 "description": value.description,
                 "documentType": value.documentType
-            }),
+            });
+        } else {
+            formData = new FormData();
+            formData.append("file", value.file);
+            formData.append("title", value.title);
+            formData.append("description", value.description);
+            formData.append("documentType", value.documentType);
+        }
+
+        axios.post('document',
+            formData,
             {
-                headers: { 
-                    "Content-Type": "application/json",
+                headers: {
+                    "Content-Type": value.file ? "multipart/form-data" : "application/json",
                     Authorization: `Bearer ${value.userToken}`
-             }
+                }
             }).then((response) => {
                 commit('setDocuments', JSON.parse(response.data))
                 resolve();
@@ -99,10 +112,10 @@ export const updateDocument = ({ commit }, value) => {
                 "documentType": value.documentType
             }),
             {
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${value.userToken}`
-             }
+                }
             }).then((response) => {
                 commit('setDocuments', JSON.parse(response.data))
                 resolve();
@@ -119,10 +132,10 @@ export const newDocumentType = ({ commit }, value) => {
                 "name": value.name,
             }),
             {
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${value.userToken}`
-             }
+                }
             }).then((response) => {
                 commit('setDocumentType', response.data)
                 resolve();

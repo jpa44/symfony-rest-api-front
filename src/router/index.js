@@ -32,14 +32,14 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login/'];
+  const publicPages = ['/'];
   const restrictedPages = ['/users/', '/document_type/'];
   const loggedIn = store.state.auth.userToken;
   
   // trying to access a restricted page + not logged in
   // redirect to login page
   if (!publicPages.includes(to.path) && !loggedIn) {
-    next('/login');
+    next('/');
   } 
 
   const roles = store.state.user.user.roles
