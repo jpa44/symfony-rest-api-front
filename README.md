@@ -4,6 +4,11 @@
 
 - Project url : [https://silly-cajeta-231ca3.netlify.app](https://silly-cajeta-231ca3.netlify.app)
 
+### Accounts
+
+- admin@admin.com / b3pn?K3B!4@pYaoF
+- user@user.com / 4chM#7fM@dG$JiMJ
+
 ### Stack 
 
 - Vuejs 2.6

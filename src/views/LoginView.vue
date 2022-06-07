@@ -10,9 +10,9 @@
                 <h2>{{ isRegister ? stateObj.register.name : stateObj.login.name }} to use our service</h2>
               </v-card-text>
               <v-card-text>
-                <form ref="form" @submit.prevent="isRegister ? register() : login()">
-                  <v-text-field v-if="isRegister" v-model="username" name="username" label="Username" type="username"
-                    placeholder="username" required></v-text-field>
+                <form ref="form" @submit.prevent="isRegister ? signup() : signin()">
+                  <v-text-field v-if="isRegister" v-model="firstName" name="firstName" label="First name" type="username"
+                    placeholder="First name" required></v-text-field>
 
                   <v-text-field v-model="email" name="email" label="Email" type="text" placeholder="email" required>
                   </v-text-field>
@@ -42,12 +42,13 @@
 
 <script>
 import { mapActions } from "vuex";
+import axios from 'axios';
 
 export default {
   name: "LoginView",
   data() {
     return {
-      username: "",
+      firstName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -67,7 +68,7 @@ export default {
   },
   methods: {
     ...mapActions(["logIn", "register", "getAuthUser"]),
-    login() {
+    signin() {
       this.errorMessage = "";
 
       this.logIn({
@@ -85,26 +86,27 @@ export default {
         this.errorMessage = "Invalid username or password";
       });
     },
-    async register() {
-      if (this.password == this.confirmPassword) {
-        this.errorMessage = "";
-
-        try {
-          await this.register({
-            firstName: this.username,
-            email: this.email,
-            password: this.password
-          });
-
-          this.isRegister = false;
-        } catch (error) {
-          this.errorMessage = "";
-        }
-
-
-      } else {
+    signup() {
+      if (this.password !== this.confirmPassword) {
         this.errorMessage = "password did not match"
+        return;
       }
+
+      this.errorMessage = "";
+
+      axios.post('register',
+        JSON.stringify({
+          firstName: this.firstName,
+          email: this.email,
+          password: this.password
+        }),
+        {
+          headers: { "Content-Type": "application/json" }
+        }).then(() => {
+          this.isRegister = false;
+        }).catch((error) => {
+          console.error(error)
+        });
     }
   },
   computed: {
@@ -116,7 +118,7 @@ export default {
 </script>
 
 <style lang="scss">
-.login{
-  background-color: #242939!important;
+.login {
+  background-color: #242939 !important;
 }
 </style>

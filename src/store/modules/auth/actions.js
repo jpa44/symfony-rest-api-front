@@ -1,13 +1,5 @@
 import axios from 'axios';
 
-export const register = async ({ dispatch }, form) => {
-    await axios.post('register', form)
-    let UserForm = new FormData()
-    UserForm.append('username', form.username)
-    UserForm.append('password', form.password)
-    await dispatch('LogIn', UserForm)
-}
-
 export const logIn = ({ commit }, user) => {
     return new Promise((resolve, reject) => {
         axios.post('login',

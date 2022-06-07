@@ -16,11 +16,11 @@
     <v-list dense nav>
       <v-list-item v-for="item in items" :key="item.title" link>
 
-        <v-list-item-icon>
+        <v-list-item-icon v-if="item.roles.includes(userRole)">
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
 
-        <v-list-item-content :to="{ path: item.path }">
+        <v-list-item-content :to="{ path: item.path }" v-if="item.roles.includes(userRole)">
           <router-link :to="{ path: item.path }">
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </router-link>
@@ -38,10 +38,15 @@ export default {
   data() {
     return {
       items: [
-        { title: 'Documents', icon: 'mdi-view-dashboard', path: '/dashboard' },
-        { title: 'Document Type', icon: 'mdi-file-document-outline', path: '/document_type' },
-        { title: 'Users', icon: 'mdi-account-group', path: '/users' },
+        { title: 'Documents', icon: 'mdi-view-dashboard', path: '/dashboard', roles : ['ROLE_USER', 'ROLE_ADMIN'] },
+        { title: 'Document Type', icon: 'mdi-file-document-outline', path: '/document_type', roles : ['ROLE_ADMIN'] },
+        { title: 'Users', icon: 'mdi-account-group', path: '/users', roles : ['ROLE_ADMIN'] },
       ],
+    }
+  },
+  computed: {
+    userRole(){
+      return this.$store.state.user.user.roles[0]
     }
   },
   methods: {

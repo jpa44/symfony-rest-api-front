@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import {trailingSlash} from "@/util/helpers";
 import {layout, route} from "@/util/routes";
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -31,6 +32,21 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const publicPages = ['/login/'];
+  const restrictedPages = ['/users/', '/document_type/'];
+  const loggedIn = store.state.auth.userToken;
+  
+  // trying to access a restricted page + not logged in
+  // redirect to login page
+  if (!publicPages.includes(to.path) && !loggedIn) {
+    next('/login');
+  } 
+
+  const roles = store.state.user.user.roles
+  if (restrictedPages.includes(to.path) && loggedIn && roles.includes('ROLE_USER')) {
+    next('/dashboard');
+  } 
+
   return to.path.endsWith('/') ? next() : next(trailingSlash(to.path))
 })
 
