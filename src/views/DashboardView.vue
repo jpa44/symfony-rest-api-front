@@ -14,7 +14,7 @@
                     {{ documentId ? 'Edit' : 'Add' }} document
                   </v-card-title>
 
-                  <DocumentForm v-if="addDocumentDialog" :documentId="documentId" />
+                  <DocumentForm v-if="addDocumentDialog" :documentId="documentId" @closeDialog="addDocumentDialog = false" />
 
                   <v-divider></v-divider>
                   <v-card-actions></v-card-actions>

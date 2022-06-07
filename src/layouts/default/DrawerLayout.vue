@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     userRole(){
-      return this.$store.state.user.user.roles[0]
+      return this.$store.state.auth.authUser.roles[0]
     }
   },
   methods: {

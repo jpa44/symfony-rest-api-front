@@ -7,6 +7,7 @@ export default {
     },
     logOut(state) {
         state.user = null
+        state.authUser = null
         state.userToken = null
     },
 }

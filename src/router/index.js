@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
     next('/');
   } 
 
-  const roles = store.state.user.user.roles ? store.state.user.user.roles : []
+  const roles = store.state.auth.authUser ? store.state.auth.authUser.roles : []
   if (restrictedPages.includes(to.path) && loggedIn && roles.includes('ROLE_USER')) {
     next('/dashboard');
   } 

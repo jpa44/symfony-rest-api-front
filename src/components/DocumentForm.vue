@@ -28,9 +28,9 @@
                                     <v-icon>mdi-file-document-outline</v-icon>
                                 </v-list-item-icon>
 
-                                <v-list-item-content>
-                                
-                                    <v-list-item-title><a :href="media.filePath">{{ sliceString(media.filePath) }}</a></v-list-item-title>
+                                <v-list-item-content @click="download(media)">
+
+                                    <v-list-item-title>{{ sliceString(media.filePath) }}</v-list-item-title>
 
                                 </v-list-item-content>
 
@@ -51,8 +51,10 @@
 </template>
 
 <script>
+import axios from 'axios';
 import MaterialCard from "@/components/MaterialCard";
 import { mapActions } from "vuex";
+import { saveAs } from 'file-saver';
 export default {
     name: "DocumentForm",
     data() {
@@ -96,13 +98,31 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["newDocument", "getDocument", "updateDocument"]),
+        ...mapActions(["getDocuments", "getDocument", "updateDocument"]),
         selectFile(file) {
             this.progress = 0;
             this.currentFile = file;
         },
         sliceString(value) {
             return value.substring(value.lastIndexOf("/") + 1)
+        },
+        download(media) {
+            axios.get('document_media/' + media.id,
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.$store.state.auth.userToken}`,
+
+                    },
+                    responseType: 'arraybuffer',
+                }).then((response) => {
+                    if (!response.data) {
+                        return console.error('Empty stream');
+                    }
+
+                    saveAs(new Blob([response.data]), media.filePath);
+                }).catch((error) => {
+                    console.error(error)
+                });
         },
         submit() {
             if (!this.documentId) {
@@ -114,11 +134,10 @@ export default {
                     userToken: this.$store.state.auth.userToken
                 }
                 ).then(() => {
-                    this.errorMessage = "";
+                    this.$emit('closeDialog')
 
                 }).catch((error) => {
                     console.error(error)
-                    this.errorMessage = "";
                 });
             } else {
                 this.updateDocument({
@@ -129,15 +148,45 @@ export default {
                     userToken: this.$store.state.auth.userToken
                 }
                 ).then(() => {
-                    this.errorMessage = "";
+                    this.$emit('closeDialog')
+                    this.getDocuments(this.$store.state.auth.userToken);
 
                 }).catch((error) => {
                     console.error(error)
-                    this.errorMessage = "";
                 });
             }
+        },
+        newDocument(value){
+                let formData;
 
-        }
+                if (!value.file) {
+                    formData = JSON.stringify({
+                        "title": value.title,
+                        "description": value.description,
+                        "documentType": value.documentType
+                    });
+                } else {
+                    formData = new FormData();
+                    formData.append("file", value.file);
+                    formData.append("title", value.title);
+                    formData.append("description", value.description);
+                    formData.append("documentType", value.documentType);
+                }
+
+                axios.post('document',
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": value.file ? "multipart/form-data" : "application/json",
+                            Authorization: `Bearer ${value.userToken}`
+                        }
+                    }).then(() => {
+                        this.$emit('closeDialog')
+                        this.getDocuments(this.$store.state.auth.userToken);
+                    }).catch((error) => {
+                        console.error(error)
+                    });
+            }
     }
 }
 </script>

@@ -68,41 +68,6 @@ export const getDocumentType = ({ commit }, userToken) => {
     })
 }
 
-export const newDocument = ({ commit }, value) => {
-    return new Promise((resolve, reject) => {
-
-        let formData;
-
-        if (!value.file) {
-            formData = JSON.stringify({
-                "title": value.title,
-                "description": value.description,
-                "documentType": value.documentType
-            });
-        } else {
-            formData = new FormData();
-            formData.append("file", value.file);
-            formData.append("title", value.title);
-            formData.append("description", value.description);
-            formData.append("documentType", value.documentType);
-        }
-
-        axios.post('document',
-            formData,
-            {
-                headers: {
-                    "Content-Type": value.file ? "multipart/form-data" : "application/json",
-                    Authorization: `Bearer ${value.userToken}`
-                }
-            }).then((response) => {
-                commit('setDocuments', JSON.parse(response.data))
-                resolve();
-            }).catch((error) => {
-                reject(error);
-            });
-    })
-}
-
 export const updateDocument = ({ commit }, value) => {
     return new Promise((resolve, reject) => {
         axios.patch('document/' + value.documentId,
@@ -117,7 +82,7 @@ export const updateDocument = ({ commit }, value) => {
                     Authorization: `Bearer ${value.userToken}`
                 }
             }).then((response) => {
-                commit('setDocuments', JSON.parse(response.data))
+                commit('setDocuments', response.data)
                 resolve();
             }).catch((error) => {
                 reject(error);
